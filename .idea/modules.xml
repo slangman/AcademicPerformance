@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/AcademicPerformance.iml" filepath="$PROJECT_DIR$/.idea/modules/AcademicPerformance.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/AcademicPerformance_main.iml" filepath="$PROJECT_DIR$/.idea/modules/AcademicPerformance_main.iml" group="AcademicPerformance" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/AcademicPerformance_test.iml" filepath="$PROJECT_DIR$/.idea/modules/AcademicPerformance_test.iml" group="AcademicPerformance" />
+    </modules>
+  </component>
+</project>
