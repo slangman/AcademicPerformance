@@ -7,11 +7,11 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
-  <head>
+<head>
     <title>Academic Performance System</title>
-  </head>
-  <body>
-  <h1>Hello there</h1>
-  <p><a href = "/view-courses-taken?student-id=3">View courses taken</a></p>
-  </body>
+</head>
+<body>
+<h1>Hello there</h1>
+<p>View courses taken</p>
+</body>
 </html>

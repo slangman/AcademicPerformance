@@ -7,13 +7,25 @@
     <display-name>MyFirstServlet</display-name>
 
     <servlet>
+        <servlet-name>ViewCoursesTaken</servlet-name>
+        <servlet-class>ru.innopolis.stc9.servlets.ViewCoursesTaken</servlet-class>
+    </servlet>
+    
+    <servlet-mapping>
+        <servlet-name>ViewCoursesTaken</servlet-name>
+        <url-pattern>/view-courses-taken</url-pattern>
+        <url-pattern>/view-courses-taken/</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
         <servlet-name>hello</servlet-name>
         <servlet-class>ru.innopolis.stc9.servlets.TestServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>
         <servlet-name>hello</servlet-name>
-        <url-pattern>/</url-pattern>
+        <url-pattern>/hello</url-pattern>
+        <url-pattern>/hello/</url-pattern>
     </servlet-mapping>
 
 </web-app>

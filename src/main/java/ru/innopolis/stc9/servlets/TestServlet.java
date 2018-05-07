@@ -14,7 +14,7 @@ public class TestServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.setCharacterEncoding("Unicode");
-        resp.getWriter().println("Шалом");
+        resp.getWriter().println("Шалом<");
         logger.info("Шалом printed");
     }
 }
