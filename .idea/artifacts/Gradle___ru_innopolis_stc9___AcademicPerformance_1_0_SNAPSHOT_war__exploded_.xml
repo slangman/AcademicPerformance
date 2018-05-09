@@ -19,7 +19,8 @@
         <element id="directory" name="lib">
           <element id="library" level="project" name="Gradle: log4j:log4j:1.2.17" />
           <element id="library" level="project" name="Gradle: javax.servlet:javax.servlet-api:3.1.0" />
-          <element id="file-copy" path="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.postgresql/postgresql/42.2.2/7ebd60d15eec1f9e796d68212121d92e3dd566b2/postgresql-42.2.2.jar" />
+          <element id="library" level="project" name="Gradle: org.postgresql:postgresql:42.2.2" />
+          <element id="file-copy" path="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.mindrot/jbcrypt/0.4/af7e61017f73abb18ac4e036954f9f28c6366c07/jbcrypt-0.4.jar" />
         </element>
       </element>
     </root>

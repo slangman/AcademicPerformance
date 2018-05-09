@@ -1,4 +1,4 @@
-package ru.innopolis.stc9.servlets;
+package ru.innopolis.stc9.controller;
 
 import ru.innopolis.stc9.pojo.Course;
 import ru.innopolis.stc9.service.StudentService;

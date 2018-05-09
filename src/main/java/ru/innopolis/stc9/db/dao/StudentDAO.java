@@ -19,13 +19,13 @@ public class StudentDAO extends UserDAOImpl {
     //private int id;
     private static ConnectionManager connectionManager = ConnectionManagerJDBCImpl.getInstance();
     final static Logger logger = Logger.getLogger("defaultLog");
-    ArrayList<Course> result = new ArrayList<>();
 
     /*public StudentDAO(int id) {
         this.id = id;
     }*/
 
     public List<Course> getCourses(int studentId) throws SQLException {
+        ArrayList<Course> result = new ArrayList<>();
         Connection connection = connectionManager.getConnection();
         PreparedStatement statement = connection.prepareStatement(
                 "SELECT courseid FROM studentsatcourse WHERE studentid = ?"
@@ -71,6 +71,7 @@ public class StudentDAO extends UserDAOImpl {
         statement.setInt(1, studentId);
         statement.setInt(2, taskId);
         ResultSet resultSet = statement.executeQuery();
+        connection.close();
         if (resultSet.next()) {
             result = resultSet.getInt("value");
         }
@@ -85,6 +86,28 @@ public class StudentDAO extends UserDAOImpl {
             for (Map.Entry<String, Integer> entry : grades.entrySet()) {
                 int gradeValue = entry.getValue();
                 sum += gradeValue;
+            }
+            result = sum/grades.size();
+        }
+        return result;
+    }
+
+    public float getAverageGrade(int studentId) throws SQLException {
+        float result = -1;
+        ArrayList<Integer> grades = new ArrayList<>();
+        Connection connection = connectionManager.getConnection();
+        PreparedStatement statement = connection.prepareStatement(
+                "SELECT * FROM grade WHERE studentid = ?"
+        );
+        ResultSet resultSet = statement.executeQuery();
+        connection.close();
+        while (resultSet.next()) {
+            grades.add(resultSet.getInt("value"));
+        }
+        if (grades.size() > 0) {
+            int sum = 0;
+            for (Integer grade : grades) {
+                sum += grade;
             }
             result = sum/grades.size();
         }

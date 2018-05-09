@@ -26,9 +26,10 @@ public class CourseDAOImpl implements CourseDAO {
         if (resultSet.next()) {
             course = new Course(
                     resultSet.getString("name"),
-                    resultSet.getInt("teacherId"),
-                    resultSet.getString("description"));
-
+                    resultSet.getInt("teacherId"));
+            if (resultSet.getString("description")!=null) {
+                course.setDescription(resultSet.getString("description"));
+            }
         } else {
             logger.warn("Course " + name + " not found.");
         }
@@ -48,9 +49,10 @@ public class CourseDAOImpl implements CourseDAO {
         if (resultSet.next()) {
             course = new Course(
                     resultSet.getString("name"),
-                    resultSet.getInt("teacherId"),
-                    resultSet.getString("description"));
-
+                    resultSet.getInt("teacherId"));
+            if (resultSet.getString("description")!=null) {
+                course.setDescription(resultSet.getString("description"));
+            }
         } else {
             logger.warn("Course with id " + id + " not found.");
         }

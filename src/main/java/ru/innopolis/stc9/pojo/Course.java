@@ -5,10 +5,9 @@ public class Course {
     private int teacherId;
     private String description;
 
-    public Course(String name, int teacherId, String description) {
+    public Course(String name, int teacherId) {
         this.name = name;
         this.teacherId = teacherId;
-        this.description = description;
     }
 
     public String getName() {

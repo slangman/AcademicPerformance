@@ -8,7 +8,7 @@
 
     <servlet>
         <servlet-name>ViewCoursesTaken</servlet-name>
-        <servlet-class>ru.innopolis.stc9.servlets.ViewCoursesTaken</servlet-class>
+        <servlet-class>ru.innopolis.stc9.controller.ViewCoursesTaken</servlet-class>
     </servlet>
     
     <servlet-mapping>
@@ -19,7 +19,7 @@
 
     <servlet>
         <servlet-name>hello</servlet-name>
-        <servlet-class>ru.innopolis.stc9.servlets.TestServlet</servlet-class>
+        <servlet-class>ru.innopolis.stc9.controller.TestServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>
@@ -27,5 +27,33 @@
         <url-pattern>/hello</url-pattern>
         <url-pattern>/hello/</url-pattern>
     </servlet-mapping>
+
+    <servlet>
+        <servlet-name>LoginController</servlet-name>
+        <servlet-class>ru.innopolis.stc9.controller.LoginController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>LoginController</servlet-name>
+        <url-pattern>/login</url-pattern>
+        <url-pattern>/login/</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>DashboardController</servlet-name>
+        <servlet-class>ru.innopolis.stc9.controller.DashboardController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>DashboardController</servlet-name>
+        <url-pattern>/inner/dashboard</url-pattern>
+    </servlet-mapping>
+
+    <filter>
+        <filter-name>auth-filter</filter-name>
+        <filter-class>ru.innopolis.stc9.controller.filter.AuthFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>auth-filter</filter-name>
+        <url-pattern>/inner/*</url-pattern>
+    </filter-mapping>
 
 </web-app>
