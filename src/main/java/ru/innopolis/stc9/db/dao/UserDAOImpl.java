@@ -17,35 +17,44 @@ import java.sql.SQLException;
 public class UserDAOImpl implements UserDAO {
 
     private static ConnectionManager connectionManager = ConnectionManagerJDBCImpl.getInstance();
-    final static Logger logger = Logger.getLogger("defaultLog");
+    private static final Logger logger = Logger.getLogger("defaultLog");
 
     @Override
-    public User getUserById(int id) throws SQLException {
+    public User getUserById(int id) {
         Connection connection = connectionManager.getConnection();
-        PreparedStatement statement = connection.prepareStatement(
-                "SELECT * FROM users where id = ?"
-        );
-        statement.setInt(1, id);
-        ResultSet resultSet = statement.executeQuery();
-        connection.close();
-        if (resultSet.next()) {
-           return getUserFromResultSet(resultSet);
+        User result = null;
+        try (PreparedStatement statement = connection.prepareStatement(
+                "SELECT * FROM users WHERE id = ?"
+        )) {
+            statement.setInt(1, id);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                connection.close();
+                if (resultSet.next()) {
+                    result = getUserFromResultSet(resultSet);
+                }
+            }
+        } catch (SQLException e) {
+            logger.error(e.getMessage());
         }
-        return null;
+        return result;
     }
 
-    public User getUserByLogin(String login) throws SQLException {
+    public User getUserByLogin(String login) {
         Connection connection = connectionManager.getConnection();
-        PreparedStatement statement = connection.prepareStatement(
-                "SELECT * FROM users where login = ?"
-        );
-        statement.setString(1, login);
-        ResultSet resultSet = statement.executeQuery();
-        connection.close();
-        if (resultSet.next()) {
-            return getUserFromResultSet(resultSet);
+        User result = null;
+        try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM users WHERE login = ?"))
+        {
+            statement.setString(1, login);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                connection.close();
+                if (resultSet.next()) {
+                    result = getUserFromResultSet(resultSet);
+                }
+            }
+        } catch (SQLException e) {
+            logger.error(e.getMessage());
         }
-        return null;
+        return result;
     }
 
     public User getUserFromResultSet(ResultSet resultSet) throws SQLException {
@@ -55,81 +64,80 @@ public class UserDAOImpl implements UserDAO {
         int roleId = resultSet.getInt("roleid");
         switch (roleId) {
             case 1:
-                user = new Admin();
+                user = new Admin(login, password);
                 break;
             case 2:
-                user = new Teacher();
+                user = new Teacher(login,password);
                 break;
             case 3:
-                user = new Student();
+                user = new Student(login, password);
+                break;
+            default:
                 break;
         }
-        user.setLogin(login);
-        user.setPassword(password);
-        if (resultSet.getString("fname") != null) {
-            user.setFirstName(resultSet.getString("fname"));
-        }
-        if (resultSet.getString("lname") != null) {
-            user.setLastName(resultSet.getString("lname"));
-        }
         if (user != null) {
-            if (user instanceof Admin) {
-                Admin admin = (Admin) user;
-                return admin;
+            if (resultSet.getString("fname") != null) {
+                user.setFirstName(resultSet.getString("fname"));
             }
-            if (user instanceof Teacher) {
-                Teacher teacher = (Teacher) user;
-                return teacher;
-            }
-            if (user instanceof Student) {
-                Student student = (Student) user;
-                return student;
+            if (resultSet.getString("lname") != null) {
+                user.setLastName(resultSet.getString("lname"));
             }
         }
-        return null;
+        return user;
     }
 
     @Override
-    public boolean addUser(User user) throws SQLException {
+    public boolean addUser(User user) {
         Connection connection = connectionManager.getConnection();
+        boolean result = false;
         String login = user.getLogin();
-        String password = user.getPassword();
-        String passwordHash = BCrypt.hashpw(password, BCrypt.gensalt());
-        int roleId = 0;
-        if (user instanceof Admin) {
-            roleId = 1;
+        if (getUserByLogin(login) == null) {
+            String password = user.getPassword();
+            String passwordHash = BCrypt.hashpw(password, BCrypt.gensalt());
+            int roleId = 0;
+            if (user instanceof Admin) {
+                roleId = 1;
+            }
+            if (user instanceof Teacher) {
+                roleId = 2;
+            }
+            if (user instanceof Student) {
+                roleId = 3;
+            }
+            String fname = "";
+            String lname = "";
+            if (user.getFirstName() != null) {
+                fname = user.getFirstName();
+            }
+            if (user.getLastName() != null) {
+                lname = user.getLastName();
+            }
+            try (PreparedStatement statement = connection.prepareStatement(
+                    "INSERT INTO users (roleid, login, password, fname, lname)" +
+                            "VALUES (?, ?, ?, ?, ?) RETURNING id"
+            )) {
+                statement.setInt(1, roleId);
+                statement.setString(2, login);
+                statement.setString(3, passwordHash);
+                statement.setString(4, fname);
+                statement.setString(5, lname);
+                try (ResultSet resultSet = statement.executeQuery()) {
+                    if (resultSet.next()) {
+                        result = true;
+                    }
+                }
+                connection.close();
+            } catch (SQLException e) {
+                logger.error(e.getMessage());
+            }
         }
-        if (user instanceof Teacher) {
-            roleId = 2;
-        }
-        if (user instanceof Student) {
-            roleId = 3;
-        }
-        String fname = "";
-        String lname = "";
-        if (user.getFirstName()!=null) {
-            fname = user.getFirstName();
-        }
-        if (user.getLastName()!=null) {
-            lname = user.getLastName();
-        }
-        PreparedStatement statement = connection.prepareStatement(
-                "INSERT INTO users (roleid, login, password, fname, lname)" +
-                        "VALUES (?, ?, ?, ?, ?)"
-        );
-        statement.setInt(1, roleId);
-        statement.setString(2, login);
-        statement.setString(3, passwordHash);
-        statement.setString(4, fname);
-        statement.setString(5, lname);
-        boolean result = statement.execute();
-        connection.close();
         return result;
     }
 
     @Override
-    public boolean updateUser(int id, User newUser) throws SQLException {
+    public boolean updateUser(int id, User newUser) {
         Connection connection = connectionManager.getConnection();
+        boolean result = false;
         String login = newUser.getLogin();
         String password = newUser.getPassword();
         int roleId = 0;
@@ -144,53 +152,64 @@ public class UserDAOImpl implements UserDAO {
         }
         String fname = "";
         String lname = "";
-        if (newUser.getFirstName()!=null) {
+        if (newUser.getFirstName() != null) {
             fname = newUser.getFirstName();
         }
-        if (newUser.getLastName()!=null) {
+        if (newUser.getLastName() != null) {
             lname = newUser.getLastName();
         }
-        PreparedStatement statement = connection.prepareStatement(
-                "UPDATE users SET roleid = ? login = ?, password = ?, fname = ?, lname = ?" +
-                        "WHERE id = ?"
-        );
-        statement.setInt(1, roleId);
-        statement.setString(2, login);
-        statement.setString(3, password);
-        statement.setString(4, fname);
-        statement.setString(5, lname);
-        statement.setInt(6, id);
-        boolean result = statement.execute();
-        connection.close();
+        try (PreparedStatement statement = connection.prepareStatement(
+                    "UPDATE users SET roleid = ?, login = ?, password = ?, fname = ?, lname = ?" +
+                            "WHERE id = ? RETURNING id"
+            )) {
+            statement.setInt(1, roleId);
+            statement.setString(2, login);
+            statement.setString(3, password);
+            statement.setString(4, fname);
+            statement.setString(5, lname);
+            statement.setInt(6, id);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    result = true;
+                }
+            }
+            connection.close();
+        } catch (SQLException e) {
+            logger.error(e.getMessage());
+        }
         return result;
     }
 
     @Override
-    public boolean deleteUser(int id) throws SQLException {
+    public void deleteUser(int id) {
         if (getUserById(id) != null) {
             Connection connection = connectionManager.getConnection();
-            PreparedStatement statement = connection.prepareStatement(
+            try (PreparedStatement statement = connection.prepareStatement(
                     "DELETE FROM users WHERE id = ?"
-            );
-            statement.setInt(1, id);
-            boolean result = statement.execute();
-            connection.close();
-            return result;
-        } else {
-            return false;
+            )) {
+                statement.setInt(1, id);
+                statement.execute();
+                connection.close();
+            } catch (SQLException e) {
+                logger.error(e.getMessage());
+            }
         }
     }
 
-    public int getUserId(String login) throws SQLException {
+    public int getUserId(String login) {
         int result = -1;
         Connection connection = connectionManager.getConnection();
-        PreparedStatement statement = connection.prepareStatement(
+        try (PreparedStatement statement = connection.prepareStatement(
                 "SELECT * FROM users WHERE login = ?"
-        );
-        statement.setString(1, login);
-        ResultSet resultSet = statement.executeQuery();
-        if (resultSet.next()) {
-            result = resultSet.getInt("id");
+        )) {
+            statement.setString(1, login);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    result = resultSet.getInt("id");
+                }
+            }
+        } catch (SQLException e) {
+            logger.error(e.getMessage());
         }
         return result;
     }

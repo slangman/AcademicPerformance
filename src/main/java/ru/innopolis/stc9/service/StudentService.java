@@ -10,11 +10,10 @@ public class StudentService {
     StudentDAO studentDao = new StudentDAO();
 
     public List<Course> getCourses(int studentId) {
-        try {
-            return studentDao.getCourses(studentId);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return null;
-        }
+        return studentDao.getCourses(studentId);
+    }
+
+    public int getStudentId(String login) {
+        return studentDao.getUserId(login);
     }
 }

@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
-public class AuthFilter implements Filter {
+public class StudentFilter implements Filter {
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
 
@@ -16,7 +16,7 @@ public class AuthFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpSession httpSession = ((HttpServletRequest) request).getSession();
-        if (httpSession.getAttribute("login")!=null) {
+        if ((httpSession.getAttribute("login")!=null)&&(httpSession.getAttribute("role").equals("Student"))) {
             chain.doFilter(request, response);
         } else {
             HttpServletResponse httpServletResponce = (HttpServletResponse) response;

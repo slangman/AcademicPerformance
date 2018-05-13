@@ -14,7 +14,7 @@ import java.util.List;
 
 public class TeacherDAO {
     private static ConnectionManager connectionManager = ConnectionManagerJDBCImpl.getInstance();
-    final static Logger logger = Logger.getLogger("defaultLog");
+    static final Logger logger = Logger.getLogger("defaultLog");
 
     public boolean addCourse(String courseName, int teacherId) throws SQLException {
         Course course = new Course(courseName, teacherId);
@@ -25,17 +25,23 @@ public class TeacherDAO {
     public List<Course> getCourses(int teacherId) throws SQLException {
         ArrayList<Course> result = new ArrayList<>();
         Connection connection = connectionManager.getConnection();
-        PreparedStatement statement = connection.prepareStatement(
+        try (PreparedStatement statement = connection.prepareStatement(
                 "SELECT id FROM course WHERE teacherid = ?"
-        );
-        statement.setInt(1, teacherId);
-        ResultSet resultSet = statement.executeQuery();
-        connection.close();
-        while (resultSet.next()) {
-            CourseDAOImpl courseDAO = new CourseDAOImpl();
-            Course course = courseDAO.getCourseById(resultSet.getInt("courseid"));
-            result.add(course);
+        )) {
+            statement.setInt(1, teacherId);
+            getCoursesFromResultSet(result, statement);
+            connection.close();
         }
         return result;
+    }
+
+    static void getCoursesFromResultSet(ArrayList<Course> result, PreparedStatement statement) throws SQLException {
+        try (ResultSet resultSet = statement.executeQuery()) {
+            while (resultSet.next()) {
+                CourseDAOImpl courseDAO = new CourseDAOImpl();
+                Course course = courseDAO.getCourseById(resultSet.getInt("courseid"));
+                result.add(course);
+            }
+        }
     }
 }

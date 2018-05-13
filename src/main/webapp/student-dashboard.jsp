@@ -1,16 +1,34 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: AttenCHUN
-  Date: 09.05.2018
-  Time: 23:43
-  To change this template use File | Settings | File Templates.
---%>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<html>
-<head>
-    <title>Title</title>
-</head>
-<body>
+<%@ page import="ru.innopolis.stc9.pojo.Course" %>
+<%@ page import="java.util.ArrayList" %>
+<%
+    ArrayList<String> courses = (ArrayList<String>)request.getAttribute("courses");
+    String helloMessage = (String)request.getAttribute("helloMessage");
+%>
 
-</body>
-</html>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ include file="header.jsp"%>
+<div class = "container">
+    <div class = "row">
+        <div class="col-md-12">
+            <h2>Student dashboard</h2>
+            <p><%=helloMessage%></p>
+
+        </div>
+    </div>
+    <div class="row">
+       <div class="col-md-12">
+           Courses you are taking:
+       </div>
+    </div>
+    <%for (String courseName : courses) {%>
+    <div class = "row">
+        <div class="col-md-12">
+            <%=courseName%>
+        </div>
+    </div>
+    <%}%>
+    <div class="row">
+        <p></p>
+    </div>
+</div>
+<%@ include file="footer.jsp"%>

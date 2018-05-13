@@ -26,8 +26,16 @@ public class LoginController extends HttpServlet {
         String login = req.getParameter("userName");
         String password = req.getParameter("userPassword");
         if (userService.auth(login, password)) {
+            String role = userService.getRole(login);
             req.getSession().setAttribute("login", login);
-            resp.sendRedirect(req.getContextPath() + "/inner/dashboard");
+            req.getSession().setAttribute("role", role);
+            switch (role) {
+                case("Admin"): resp.sendRedirect(req.getContextPath() + "/admin/dashboard");
+                break;
+                case("Teacher"): resp.sendRedirect(req.getContextPath() + "/teacher/dashboard");
+                break;
+                case("Student"): resp.sendRedirect(req.getContextPath() + "/student/dashboard");
+            }
         } else {
             resp.sendRedirect(req.getContextPath() + "/login?errorMsg=authError");
         }

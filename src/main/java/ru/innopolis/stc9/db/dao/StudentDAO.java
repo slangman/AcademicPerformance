@@ -16,69 +16,77 @@ import java.util.Map;
 
 public class StudentDAO extends UserDAOImpl {
 
-    //private int id;
     private static ConnectionManager connectionManager = ConnectionManagerJDBCImpl.getInstance();
-    final static Logger logger = Logger.getLogger("defaultLog");
+    static final Logger logger = Logger.getLogger("defaultLog");
 
     /*public StudentDAO(int id) {
         this.id = id;
     }*/
 
-    public List<Course> getCourses(int studentId) throws SQLException {
+    public List<Course> getCourses(int studentId)  {
         ArrayList<Course> result = new ArrayList<>();
         Connection connection = connectionManager.getConnection();
-        PreparedStatement statement = connection.prepareStatement(
+
+        try (PreparedStatement statement = connection.prepareStatement(
                 "SELECT courseid FROM studentsatcourse WHERE studentid = ?"
-        );
-        statement.setInt(1, studentId);
-        ResultSet resultSet = statement.executeQuery();
-        connection.close();
-        while (resultSet.next()) {
-           CourseDAOImpl courseDAO = new CourseDAOImpl();
-           Course course = courseDAO.getCourseById(resultSet.getInt("courseid"));
-           result.add(course);
+        )) {
+            statement.setInt(1, studentId);
+            TeacherDAO.getCoursesFromResultSet(result, statement);
+            connection.close();
+        } catch (SQLException e) {
+            logger.error(e.getMessage());
         }
         return result;
     }
 
     //Добавить таскам имя (поля "описание" недостаточно).
-    public Map<String, Integer> getGradesByCourse(int studentId, int courseId) throws SQLException {
+    public Map<String, Integer> getGradesByCourse(int studentId, int courseId) {
         Connection connection = connectionManager.getConnection();
         Map<String, Integer> result = new HashMap<>();
-        PreparedStatement statement = connection.prepareStatement(
-                "SELECT task.description, grade.value FROM grade" +
-                        "INNER JOIN task ON grade.taskid = task.id" +
+        try (PreparedStatement statement = connection.prepareStatement(
+                "SELECT task.name, grade.value FROM grade " +
+                        "INNER JOIN task ON grade.taskid = task.id " +
                         "WHERE studentid=? AND courseid=?"
-        );
-        statement.setInt(1, studentId);
-        statement.setInt(2, courseId);
-        ResultSet resultSet = statement.executeQuery();
-        connection.close();
-        while (resultSet.next()) {
-            String description = resultSet.getString("description");
-            Integer value = resultSet.getInt("value");
-            result.put(description, value);
+        )) {
+            statement.setInt(1, studentId);
+            statement.setInt(2, courseId);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    String description = resultSet.getString("description");
+                    Integer value = resultSet.getInt("value");
+                    result.put(description, value);
+                }
+            }
+            connection.close();
+        } catch (SQLException e) {
+            logger.error(e.getMessage());
         }
+
         return result;
     }
 
     public int getGradeByTask(int studentId, int taskId) throws SQLException {
         int result = -1;
         Connection connection = connectionManager.getConnection();
-        PreparedStatement statement = connection.prepareStatement(
+        try (PreparedStatement statement = connection.prepareStatement(
             "SELECT value FROM grade WHERE studentid = ? AND taskid = ?"
-        );
-        statement.setInt(1, studentId);
-        statement.setInt(2, taskId);
-        ResultSet resultSet = statement.executeQuery();
-        connection.close();
-        if (resultSet.next()) {
-            result = resultSet.getInt("value");
+        )) {
+            statement.setInt(1, studentId);
+            statement.setInt(2, taskId);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    result = resultSet.getInt("value");
+                }
+            }
+            connection.close();
+        } catch (SQLException e) {
+            logger.error(e.getMessage());
         }
+
         return result;
     }
 
-    public float getAverageGradeBuCourse(int studentId, int courseId) throws SQLException {
+    public float getAverageGradeBuCourse(int studentId, int courseId) {
         float result = -1;
         Map <String, Integer> grades = getGradesByCourse(studentId, courseId);
         if (grades!=null && grades.size()>0) {
@@ -87,7 +95,7 @@ public class StudentDAO extends UserDAOImpl {
                 int gradeValue = entry.getValue();
                 sum += gradeValue;
             }
-            result = sum/grades.size();
+            result = ((float)sum)/grades.size();
         }
         return result;
     }
@@ -96,36 +104,47 @@ public class StudentDAO extends UserDAOImpl {
         float result = -1;
         ArrayList<Integer> grades = new ArrayList<>();
         Connection connection = connectionManager.getConnection();
-        PreparedStatement statement = connection.prepareStatement(
+        try (PreparedStatement statement = connection.prepareStatement(
                 "SELECT * FROM grade WHERE studentid = ?"
-        );
-        ResultSet resultSet = statement.executeQuery();
-        connection.close();
-        while (resultSet.next()) {
-            grades.add(resultSet.getInt("value"));
-        }
-        if (grades.size() > 0) {
-            int sum = 0;
-            for (Integer grade : grades) {
-                sum += grade;
+        )) {
+            statement.setInt(1, studentId);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    grades.add(resultSet.getInt("value"));
+                }
+                if (!grades.isEmpty()) {
+                    int sum = 0;
+                    for (Integer grade : grades) {
+                        sum += grade;
+                    }
+                    result = ((float)sum) / grades.size();
+                }
             }
-            result = sum/grades.size();
+            connection.close();
+        } catch (SQLException e) {
+            logger.error(e.getMessage());
         }
+
         return result;
     }
 
-    public boolean checkStudentOnCourse(int studentId, int courseId) throws SQLException {
+    public boolean checkStudentOnCourse(int studentId, int courseId) {
         Connection connection = connectionManager.getConnection();
-        PreparedStatement statement = connection.prepareStatement(
+        boolean result = false;
+        try (PreparedStatement statement = connection.prepareStatement(
                 "SELECT * FROM studentsatcourse WHERE courseid = ? AND studentid = ?"
-        );
-        statement.setInt(1, courseId);
-        statement.setInt(2, studentId);
-        ResultSet resultSet = statement.executeQuery();
-        connection.close();
-        if (resultSet.next()) {
-            return true;
+        )) {
+            statement.setInt(1, courseId);
+            statement.setInt(2, studentId);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    result = true;
+                }
+            }
+            connection.close();
+        } catch (SQLException e) {
+            logger.error(e.getMessage());
         }
-        return false;
+        return result;
     }
 }
