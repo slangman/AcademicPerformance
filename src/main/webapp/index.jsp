@@ -5,7 +5,6 @@
     <div class = "row">
         <div class = "col-md-12">
             <h1>Hello there</h1>
-            <p><a href = "/view-courses-taken?student-id=3">View courses taken</a></p>
             <p><a href = "/login">Log in</a></p>
         </div>
     </div>

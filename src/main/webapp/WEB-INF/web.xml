@@ -73,6 +73,24 @@
         <url-pattern>/student/dashboard</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>EditUserController</servlet-name>
+        <servlet-class>ru.innopolis.stc9.controller.admin.EditUserController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>EditUserController</servlet-name>
+        <url-pattern>/admin/edit-user</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>ViewGradesController</servlet-name>
+        <servlet-class>ru.innopolis.stc9.controller.student.ViewGradesController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ViewGradesController</servlet-name>
+        <url-pattern>/student/view-grades</url-pattern>
+    </servlet-mapping>
+
     <filter>
         <filter-name>auth-filter</filter-name>
         <filter-class>ru.innopolis.stc9.controller.filter.StudentFilter</filter-class>
@@ -81,5 +99,5 @@
         <filter-name>auth-filter</filter-name>
         <url-pattern>/inner/*</url-pattern>
     </filter-mapping>
-
+    
 </web-app>

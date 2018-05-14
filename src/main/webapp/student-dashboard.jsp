@@ -23,7 +23,7 @@
     <%for (String courseName : courses) {%>
     <div class = "row">
         <div class="col-md-12">
-            <%=courseName%>
+            <a href="${pageContext.request.contextPath}/student/view-grades?course-name=<%=courseName%>"><%=courseName%></a>
         </div>
     </div>
     <%}%>

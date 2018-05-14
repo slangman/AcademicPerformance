@@ -48,4 +48,8 @@ public class UserService {
         }
         return helloMessage;
     }
+
+    public User getUserByLogin(String login) {
+        return userDao.getUserByLogin(login);
+    }
 }
