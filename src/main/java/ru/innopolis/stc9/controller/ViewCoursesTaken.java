@@ -18,7 +18,7 @@ public class ViewCoursesTaken extends HttpServlet {
         resp.setCharacterEncoding("Unicode");
         String studentId = req.getParameter("student-id");
         if (studentId!=null) {
-            List<Course> courses = studentService.getCourses(Integer.parseInt(studentId));
+            List<Course> courses = studentService.getCoursesById(Integer.parseInt(studentId));
             for (Course course: courses) {
                 resp.getWriter().println(course.getName());
             }

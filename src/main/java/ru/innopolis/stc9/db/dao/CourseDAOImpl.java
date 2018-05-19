@@ -4,39 +4,47 @@ import org.apache.log4j.Logger;
 import ru.innopolis.stc9.db.connection.ConnectionManager;
 import ru.innopolis.stc9.db.connection.ConnectionManagerJDBCImpl;
 import ru.innopolis.stc9.pojo.Course;
+import ru.innopolis.stc9.pojo.Student;
+import ru.innopolis.stc9.pojo.Task;
+import ru.innopolis.stc9.pojo.User;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CourseDAOImpl implements CourseDAO {
 
     private static final Logger logger = Logger.getLogger("defaultLog");
     private static ConnectionManager connectionManager = ConnectionManagerJDBCImpl.getInstance();
+    UserDAOImpl userDAO = new UserDAOImpl();
 
     @Override
     public Course getCourseByName(String name) {
-        Connection connection = connectionManager.getConnection();
         Course course = null;
-        try (PreparedStatement statement = connection.prepareStatement(
-                "SELECT * FROM course WHERE name = ?")) {
-            statement.setString(1, name);
-            try (ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next()) {
-                    course = new Course(
-                            resultSet.getString("name"),
-                            resultSet.getInt("teacherId"));
-                    if (resultSet.getString("description") != null) {
-                        course.setDescription(resultSet.getString("description"));
+        if (name!=null && !name.isEmpty()) {
+            Connection connection = connectionManager.getConnection();
+            try (PreparedStatement statement = connection.prepareStatement(
+                    "SELECT * FROM course WHERE name = ?")) {
+                statement.setString(1, name);
+                try (ResultSet resultSet = statement.executeQuery()) {
+                    if (resultSet.next()) {
+                        course = new Course(
+                                resultSet.getString("name"),
+                                resultSet.getInt("teacherId"));
+                        if (resultSet.getString("description") != null) {
+                            course.setDescription(resultSet.getString("description"));
+                        }
+                    } else {
+                        logger.warn("Course " + name + " not found.");
                     }
-                } else {
-                    logger.warn("Course " + name + " not found.");
                 }
+                connection.close();
+            } catch (SQLException e) {
+                logger.error(e.getMessage());
             }
-            connection.close();
-        } catch (SQLException e) {
-            logger.error(e.getMessage());
         }
         return course;
     }
@@ -49,7 +57,6 @@ public class CourseDAOImpl implements CourseDAO {
                 "SELECT * FROM course WHERE id = ?")) {
             statement.setInt(1, id);
             try (ResultSet resultSet = statement.executeQuery()) {
-
                 if (resultSet.next()) {
                     course = new Course(
                             resultSet.getString("name"),
@@ -150,24 +157,25 @@ public class CourseDAOImpl implements CourseDAO {
 
     private boolean checkIfTeacherExists(int id) {
         boolean result = false;
-        Connection connection = connectionManager.getConnection();
-        try (PreparedStatement statement = connection.prepareStatement(
-                "SELECT * FROM users WHERE id = ? AND roleid = 2"
-        )) {
-            statement.setInt(1, id);
-            try (ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next()) {
-                    result = true;
+        if (id > 0) {
+            Connection connection = connectionManager.getConnection();
+            try (PreparedStatement statement = connection.prepareStatement(
+                    "SELECT * FROM users WHERE id = ? AND roleid = 2"
+            )) {
+                statement.setInt(1, id);
+                try (ResultSet resultSet = statement.executeQuery()) {
+                    if (resultSet.next()) {
+                        result = true;
+                    }
                 }
+                connection.close();
+            } catch (SQLException e) {
+                logger.error(e.getMessage());
             }
-            connection.close();
-        } catch (SQLException e) {
-            logger.error(e.getMessage());
         }
         return result;
     }
 
-    //TODO: отрефакторить!
     public int getCourseId(String courseName) {
         int result = 0;
         Connection connection = connectionManager.getConnection();
@@ -178,6 +186,48 @@ public class CourseDAOImpl implements CourseDAO {
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
                     result=resultSet.getInt("id");
+                }
+            }
+        } catch (SQLException e) {
+            logger.error(e.getMessage());
+        }
+        return result;
+    }
+
+    public List<Task> getTasks(int id) {
+        List<Task> result = new ArrayList<>();
+        Connection connection = connectionManager.getConnection();
+        try (PreparedStatement statement = connection.prepareStatement(
+                "SELECT * FROM task WHERE courseid=?"
+        )) {
+            statement.setInt(1, id);
+            try (ResultSet resultSet = statement.executeQuery()){
+                while (resultSet.next()) {
+                    Task task = new Task(
+                            resultSet.getString("name"),
+                            resultSet.getString("description"),
+                            id);
+                    result.add(task);
+                }
+            }
+            connection.close();
+            } catch (SQLException e) {
+            logger.error(e.getMessage());
+        }
+        return result;
+    }
+
+    public List<User> getStudentsOnCourse(int courseId) {
+        List<User> result = new ArrayList<>();
+        Connection connection = connectionManager.getConnection();
+        try (PreparedStatement statement = connection.prepareStatement(
+                "SELECT studentid FROM studentsatcourse WHERE courseid = ?"
+        )) {
+            statement.setInt(1, courseId);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    int studentId = resultSet.getInt("studentid");
+                    result.add(userDAO.getUserById(studentId));
                 }
             }
         } catch (SQLException e) {

@@ -90,6 +90,15 @@
         <servlet-name>ViewGradesController</servlet-name>
         <url-pattern>/student/view-grades</url-pattern>
     </servlet-mapping>
+    
+    <servlet>
+        <servlet-name>ViewCourseController</servlet-name>
+        <servlet-class>ru.innopolis.stc9.controller.teacher.ViewCourseController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ViewCourseController</servlet-name>
+        <url-pattern>/teacher/view-course</url-pattern>
+    </servlet-mapping>
 
     <filter>
         <filter-name>auth-filter</filter-name>

@@ -10,9 +10,6 @@ import java.sql.SQLException;
 public class Main {
     public static void main(String[] args) throws SQLException {
         UserDAOImpl userDao = new UserDAOImpl();
-        Teacher teacher = new Teacher("Rubeus", "Hagrid");
-        teacher.setLogin("teacherrh");
-        teacher.setPassword("123");
-        System.out.println(userDao.addUser(teacher));
+        System.out.println(userDao.updatePassword("ronweasley", "123"));
     }
 }

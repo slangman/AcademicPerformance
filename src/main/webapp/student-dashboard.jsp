@@ -12,7 +12,6 @@
         <div class="col-md-12">
             <h2>Student dashboard</h2>
             <p><%=helloMessage%></p>
-
         </div>
     </div>
     <div class="row">

@@ -52,9 +52,9 @@ public class StudentDAO extends UserDAOImpl {
             statement.setInt(2, courseId);
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
-                    String description = resultSet.getString("description");
+                    String name = resultSet.getString("name");
                     Integer value = resultSet.getInt("value");
-                    result.put(description, value);
+                    result.put(name, value);
                 }
             }
             connection.close();
@@ -65,7 +65,7 @@ public class StudentDAO extends UserDAOImpl {
         return result;
     }
 
-    public int getGradeByTask(int studentId, int taskId) throws SQLException {
+    public int getGradeByTask(int studentId, int taskId) {
         int result = -1;
         Connection connection = connectionManager.getConnection();
         try (PreparedStatement statement = connection.prepareStatement(
@@ -86,7 +86,7 @@ public class StudentDAO extends UserDAOImpl {
         return result;
     }
 
-    public float getAverageGradeBuCourse(int studentId, int courseId) {
+    public float getAverageGradeByCourse(int studentId, int courseId) {
         float result = -1;
         Map <String, Integer> grades = getGradesByCourse(studentId, courseId);
         if (grades!=null && grades.size()>0) {
@@ -100,7 +100,7 @@ public class StudentDAO extends UserDAOImpl {
         return result;
     }
 
-    public float getAverageGrade(int studentId) throws SQLException {
+    public float getAverageGrade(int studentId) {
         float result = -1;
         ArrayList<Integer> grades = new ArrayList<>();
         Connection connection = connectionManager.getConnection();

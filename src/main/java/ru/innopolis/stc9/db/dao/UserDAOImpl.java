@@ -213,4 +213,27 @@ public class UserDAOImpl implements UserDAO {
         }
         return result;
     }
+
+    public boolean updatePassword(String login, String newPassword) {
+        boolean result = false;
+        if (login!=null && newPassword!=null){
+            String passwordHash = BCrypt.hashpw(newPassword, BCrypt.gensalt());
+            Connection connection = connectionManager.getConnection();
+            try (PreparedStatement statement = connection.prepareStatement(
+                    "UPDATE users SET password=?" +
+                            "WHERE login = ? RETURNING id"
+            )) {
+                statement.setString(1, passwordHash);
+                statement.setString(2, login);
+                try (ResultSet resultSet = statement.executeQuery()) {
+                    if (resultSet.next()) {
+                        result = true;
+                    }
+                }
+            } catch (SQLException e) {
+                logger.info(e.getMessage());
+            }
+        }
+        return result;
+    }
 }

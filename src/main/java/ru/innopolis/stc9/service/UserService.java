@@ -20,7 +20,7 @@ public class UserService {
         return false;
     }
 
-    private boolean checkPassword (String password, String passwordHash) {
+    public boolean checkPassword (String password, String passwordHash) {
         if (BCrypt.checkpw(password, passwordHash)) {
             return true;
         } else {
