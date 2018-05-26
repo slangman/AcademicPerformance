@@ -28,7 +28,7 @@ public class StudentDAO extends UserDAOImpl {
         Connection connection = connectionManager.getConnection();
 
         try (PreparedStatement statement = connection.prepareStatement(
-                "SELECT courseid FROM studentsatcourse WHERE studentid = ?"
+                "SELECT courseid AS id FROM studentsatcourse WHERE studentid = ?"
         )) {
             statement.setInt(1, studentId);
             TeacherDAO.getCoursesFromResultSet(result, statement);
@@ -39,7 +39,6 @@ public class StudentDAO extends UserDAOImpl {
         return result;
     }
 
-    //Добавить таскам имя (поля "описание" недостаточно).
     public Map<String, Integer> getGradesByCourse(int studentId, int courseId) {
         Connection connection = connectionManager.getConnection();
         Map<String, Integer> result = new HashMap<>();

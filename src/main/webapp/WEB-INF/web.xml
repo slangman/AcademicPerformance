@@ -83,6 +83,15 @@
     </servlet-mapping>
 
     <servlet>
+        <servlet-name>EditCourseController</servlet-name>
+        <servlet-class>ru.innopolis.stc9.controller.admin.EditCourseController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>EditCourseController</servlet-name>
+        <url-pattern>/admin/edit-course</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
         <servlet-name>ViewGradesController</servlet-name>
         <servlet-class>ru.innopolis.stc9.controller.student.ViewGradesController</servlet-class>
     </servlet>
@@ -98,6 +107,15 @@
     <servlet-mapping>
         <servlet-name>ViewCourseController</servlet-name>
         <url-pattern>/teacher/view-course</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>EditTaskController</servlet-name>
+        <servlet-class>ru.innopolis.stc9.controller.teacher.EditTaskController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>EditTaskController</servlet-name>
+        <url-pattern>/teacher/edit-task</url-pattern>
     </servlet-mapping>
 
     <filter>

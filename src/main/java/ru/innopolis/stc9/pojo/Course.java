@@ -1,13 +1,25 @@
 package ru.innopolis.stc9.pojo;
 
 public class Course {
+    private int id;
     private String name;
     private int teacherId;
     private String description;
 
+    public Course() {
+    }
+
     public Course(String name, int teacherId) {
         this.name = name;
         this.teacherId = teacherId;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getName() {

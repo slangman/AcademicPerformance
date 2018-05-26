@@ -18,6 +18,7 @@ public class EditUserController extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String login = req.getParameter("user-login");
         String msg = req.getParameter("msg");
+        String err = req.getParameter("err");
         if (login != null && !login.isEmpty()) {
             User user = userService.getUserByLogin(login);
             req.setAttribute("user", user);
@@ -25,6 +26,10 @@ public class EditUserController extends HttpServlet {
         if (msg != null && !msg.isEmpty()) {
             String updateMessage = adminService.getUpdateMessage(msg);
             req.setAttribute("updateMessage", updateMessage);
+        }
+        if (err !=null && !err.isEmpty()) {
+            String errorMessage = adminService.getErrorMessage(err);
+            req.setAttribute("errorMessage", errorMessage);
         }
 
         req.getRequestDispatcher("/admin-tools/edit-user.jsp").forward(req, resp);
@@ -39,17 +44,20 @@ public class EditUserController extends HttpServlet {
         String oldPassword = req.getParameter("oldPassword");
         String newPassword = req.getParameter("newPassword");
         String repeatNewPassword = req.getParameter("repeatNewPassword");
-        String msg=null;
-
-        boolean updateSuccess = (adminService.updateUser(editLogin, fName, lName)&&adminService.updatePassword(req));
-        if (updateSuccess) {
+        String msg;
+        String err="";
+        boolean updateSuccess = adminService.updateUser(editLogin, fName, lName);
+        String updatePasswordResult = adminService.updatePassword(req);
+        if (updateSuccess && updatePasswordResult==null) {
             msg = "updated";
         } else {
             msg = "updateError";
         }
-        req.setAttribute("oldPasswordMessage", adminService.getOldPasswordMessage());
-        req.setAttribute("newPasswordMessage", adminService.getNewPasswordMessage());
-        resp.sendRedirect(req.getContextPath() + "?user-login=" + editLogin + "&msg=" + msg);
+        if (updatePasswordResult!=null) {
+            err = updatePasswordResult;
+        }
+        System.out.println(updatePasswordResult);
+        resp.sendRedirect(req.getContextPath() + "?user-login=" + editLogin + "&msg=" + msg + "&err=" + err);
 
     }
 }

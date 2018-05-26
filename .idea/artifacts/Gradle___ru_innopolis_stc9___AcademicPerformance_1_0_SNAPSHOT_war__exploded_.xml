@@ -20,7 +20,12 @@
           <element id="library" level="project" name="Gradle: log4j:log4j:1.2.17" />
           <element id="library" level="project" name="Gradle: javax.servlet:javax.servlet-api:3.1.0" />
           <element id="library" level="project" name="Gradle: org.postgresql:postgresql:42.2.2" />
-          <element id="file-copy" path="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.mindrot/jbcrypt/0.4/af7e61017f73abb18ac4e036954f9f28c6366c07/jbcrypt-0.4.jar" />
+          <element id="library" level="project" name="Gradle: org.mindrot:jbcrypt:0.4" />
+          <element id="library" level="project" name="Gradle: org.springframework:spring-tx:5.0.6.RELEASE" />
+          <element id="library" level="project" name="Gradle: org.springframework:spring-beans:5.0.6.RELEASE" />
+          <element id="library" level="project" name="Gradle: org.springframework:spring-core:5.0.6.RELEASE" />
+          <element id="library" level="project" name="Gradle: org.springframework:spring-jcl:5.0.6.RELEASE" />
+          <element id="file-copy" path="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.springframework/spring-jdbc/5.0.6.RELEASE/7d4de1ee9b042774e09ceb88393e5a564e342729/spring-jdbc-5.0.6.RELEASE.jar" />
         </element>
       </element>
     </root>

@@ -58,7 +58,7 @@ public class UserDAOTest {
     }
 
     @Test
-    public void addExistingUserTest() throws SQLException {
+    public void addExistingUserTest() {
         Student tempUser1 = new Student("tempUser1", "password");
         userDao.addUser(tempUser1);
         assertFalse(userDao.addUser(tempUser1));

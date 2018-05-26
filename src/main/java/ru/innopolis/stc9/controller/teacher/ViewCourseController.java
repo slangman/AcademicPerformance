@@ -1,5 +1,6 @@
 package ru.innopolis.stc9.controller.teacher;
 
+import ru.innopolis.stc9.pojo.Task;
 import ru.innopolis.stc9.service.CourseService;
 import ru.innopolis.stc9.service.StudentService;
 
@@ -18,8 +19,9 @@ public class ViewCourseController extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         int courseId=Integer.parseInt(req.getParameter("courseid"));
         String courseName = courseService.getCourseName(courseId);
-        Map<String, String> tasks = courseService.getTasks(courseId);
+        List<Task> tasks = courseService.getTasks(courseId);
         Map<String, Double> students = courseService.getStudents(courseId);
+        req.setAttribute("courseId", courseId);
         req.setAttribute("courseName", courseName);
         req.setAttribute("tasks", tasks);
         req.setAttribute("students", students);

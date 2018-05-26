@@ -30,23 +30,25 @@
                         </div>
                     </div>
                     <b>Change password</b>
-                    <div class="form-group">
-                        <label>Old password</label><input type="password" class="form-control" id="oldPassword" placeholder="Old password" name="oldPassword">
-
-                        <%if (request.getAttribute("oldPasswordMessage")!=null) {
-                            String oldPasswordMessage = (String)request.getAttribute("oldPasswordMessage");
-                            %>
-                        <p><%=oldPasswordMessage%></p>
-                        <%}%>
-
-                        <label>New passord</label><input type="password" class="form-control" id="newPassword" placeholder="New password" name="newPassword">
-                        <%if (request.getAttribute("newPasswordMessage")!=null) {
-                            String newPasswordMessage = (String)request.getAttribute("newPasswordMessage");
-                        %>
-                        <p><%=newPasswordMessage%></p>
-                        <%}%>
-                        <label>Repeat new passord</label><input type="password" class="form-control" id="repeatNewPassword" placeholder="Repeat new password" name="repeatNewPassword">
+                    <div class="form-group row">
+                        <label for="oldPassword" class="col-sm-3 col-form-label">Old password</label>
+                        <div class="col-sm-9">
+                            <input type="password" class="form-control" id="oldPassword" placeholder="Old password" name="oldPassword">
+                        </div>
                     </div>
+                    <div class="form-group row">
+                        <label for="newPassword" class="col-sm-3 col-form-label">New password</label>
+                        <div class="col-sm-9">
+                            <input type="password" class="form-control" id="newPassword" placeholder="New password" name="newPassword">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="newPassword" class="col-sm-3 col-form-label">Repeat password</label>
+                        <div class="col-sm-9">
+                            <input type="password" class="form-control" id="repeatNewPassword" placeholder="Repeat new password" name="repeatNewPassword">
+                        </div>
+                    </div>
+
                     <button type="submit" class="btn btn-primary">Save</button>
                 </form>
             </div>
@@ -62,11 +64,14 @@
             </div>
         </div>
         <%}%>
+        <%if (request.getAttribute("errorMessage")!=null) {
+            String errorMessage = (String)request.getAttribute("errorMessage");
+        %>
         <div class="row">
             <div class="col-md-12">
-                <%=request.getAttribute("oldPasswordMessage")%>
-                <%=request.getAttribute("newPasswordMessage")%>
+                <%=errorMessage%>
             </div>
         </div>
+        <%}%>
     </div>
 <%@ include file="/footer.jsp"%>

@@ -2,6 +2,13 @@
 <%String courseName = (String)request.getAttribute("courseName");%>
 <%Map<String, Integer> grades = (Map<String, Integer>)request.getAttribute("grades");%>
 <%@ include file="/header.jsp"%>
+<div class = "container menu">
+    <div class="row">
+        <div class="col-md-12">
+            <a href = /student/dashboard">Dashboard Home</a> -> View course grades
+        </div>
+    </div>
+</div>
 <div class="container">
     <div class="row">
         <div class="col-md-12">

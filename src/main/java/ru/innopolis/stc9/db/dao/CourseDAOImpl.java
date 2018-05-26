@@ -1,8 +1,12 @@
 package ru.innopolis.stc9.db.dao;
 
 import org.apache.log4j.Logger;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.transaction.annotation.Transactional;
 import ru.innopolis.stc9.db.connection.ConnectionManager;
 import ru.innopolis.stc9.db.connection.ConnectionManagerJDBCImpl;
+import ru.innopolis.stc9.db.dao.mapper.CourseMapper;
 import ru.innopolis.stc9.pojo.Course;
 import ru.innopolis.stc9.pojo.Student;
 import ru.innopolis.stc9.pojo.Task;
@@ -15,11 +19,26 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class CourseDAOImpl implements CourseDAO {
 
     private static final Logger logger = Logger.getLogger("defaultLog");
     private static ConnectionManager connectionManager = ConnectionManagerJDBCImpl.getInstance();
     UserDAOImpl userDAO = new UserDAOImpl();
+
+    public List<Course> getCoursesList() {
+        List<Course> result = null;
+        Connection connection = connectionManager.getConnection();
+        try (PreparedStatement statement = connection.prepareStatement(
+                "SELECT * FROM course"
+        )) { try (ResultSet resultSet = statement.executeQuery()) {
+            result = CourseMapper.getCourseListFromResultSet(resultSet);
+        }
+        } catch (SQLException e) {
+            logger.error(e.getMessage());
+        }
+        return result;
+    }
 
     @Override
     public Course getCourseByName(String name) {
@@ -37,6 +56,7 @@ public class CourseDAOImpl implements CourseDAO {
                         if (resultSet.getString("description") != null) {
                             course.setDescription(resultSet.getString("description"));
                         }
+                        logger.info("Course " + name + " successfully returned.");
                     } else {
                         logger.warn("Course " + name + " not found.");
                     }
@@ -64,6 +84,7 @@ public class CourseDAOImpl implements CourseDAO {
                     if (resultSet.getString("description") != null) {
                         course.setDescription(resultSet.getString("description"));
                     }
+                    logger.info("Course with id " + id +" successfully returned.");
                 } else {
                     logger.warn("Course with id " + id + " not found.");
                 }
@@ -207,6 +228,8 @@ public class CourseDAOImpl implements CourseDAO {
                             resultSet.getString("name"),
                             resultSet.getString("description"),
                             id);
+                    int taskId = resultSet.getInt("id");
+                    task.setId(taskId);
                     result.add(task);
                 }
             }

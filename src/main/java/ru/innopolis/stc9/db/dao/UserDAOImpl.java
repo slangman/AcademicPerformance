@@ -1,5 +1,13 @@
 package ru.innopolis.stc9.db.dao;
 
+/**
+ * Implementation of UserDAO interface.
+ * Operates with user data stored in database.
+ *
+ * @author Daniil Ivantsov
+ * @version 1.0
+ */
+
 import org.apache.log4j.Logger;
 import org.mindrot.jbcrypt.BCrypt;
 import ru.innopolis.stc9.db.connection.ConnectionManager;
@@ -19,6 +27,11 @@ public class UserDAOImpl implements UserDAO {
     private static ConnectionManager connectionManager = ConnectionManagerJDBCImpl.getInstance();
     private static final Logger logger = Logger.getLogger("defaultLog");
 
+    /**
+     *
+     * @param id
+     * @return User object
+     */
     @Override
     public User getUserById(int id) {
         Connection connection = connectionManager.getConnection();
@@ -39,6 +52,10 @@ public class UserDAOImpl implements UserDAO {
         return result;
     }
 
+    /**
+     * @param login
+     * @return User object.
+     */
     public User getUserByLogin(String login) {
         Connection connection = connectionManager.getConnection();
         User result = null;
@@ -57,34 +74,51 @@ public class UserDAOImpl implements UserDAO {
         return result;
     }
 
-    public User getUserFromResultSet(ResultSet resultSet) throws SQLException {
+    /**
+     * Service method to get User object from given ResultSet.
+     * @param resultSet an <tt>ResultSet</tt> object
+     * @return User object.
+     * @throws SQLException
+     */
+    public User getUserFromResultSet(ResultSet resultSet) {
         User user = null;
-        String login = resultSet.getString("login");
-        String password = resultSet.getString("password");
-        int roleId = resultSet.getInt("roleid");
-        switch (roleId) {
-            case 1:
-                user = new Admin(login, password);
-                break;
-            case 2:
-                user = new Teacher(login,password);
-                break;
-            case 3:
-                user = new Student(login, password);
-                break;
-            default:
-                break;
-        }
-        if (user != null) {
-            if (resultSet.getString("fname") != null) {
-                user.setFirstName(resultSet.getString("fname"));
+        try {
+            String login = resultSet.getString("login");
+            String password = resultSet.getString("password");
+            int roleId = resultSet.getInt("roleid");
+            switch (roleId) {
+                case 1:
+                    user = new Admin(login, password);
+                    break;
+                case 2:
+                    user = new Teacher(login, password);
+                    break;
+                case 3:
+                    user = new Student(login, password);
+                    break;
+                default:
+                    break;
             }
-            if (resultSet.getString("lname") != null) {
-                user.setLastName(resultSet.getString("lname"));
+
+            if (user != null) {
+                if (resultSet.getString("fname") != null) {
+                    user.setFirstName(resultSet.getString("fname"));
+                }
+                if (resultSet.getString("lname") != null) {
+                    user.setLastName(resultSet.getString("lname"));
+                }
             }
+        } catch (SQLException e) {
+            logger.error(e.getMessage());
         }
         return user;
     }
+
+    /**
+     * Determines role of given User parameter and adds new user entry to database.
+     * @param user an <tt>User</tt> object
+     * @return true if success.
+     */
 
     @Override
     public boolean addUser(User user) {
@@ -94,16 +128,7 @@ public class UserDAOImpl implements UserDAO {
         if (getUserByLogin(login) == null) {
             String password = user.getPassword();
             String passwordHash = BCrypt.hashpw(password, BCrypt.gensalt());
-            int roleId = 0;
-            if (user instanceof Admin) {
-                roleId = 1;
-            }
-            if (user instanceof Teacher) {
-                roleId = 2;
-            }
-            if (user instanceof Student) {
-                roleId = 3;
-            }
+            int roleId = detectUserRole(user);
             String fname = "";
             String lname = "";
             if (user.getFirstName() != null) {
@@ -134,22 +159,19 @@ public class UserDAOImpl implements UserDAO {
         return result;
     }
 
+    /**
+     * Detemines user role by parameter class and updates existing user in database by id.
+     * @param id
+     * @param newUser an <tt>User</tt> object
+     * @return true if success.
+     */
     @Override
     public boolean updateUser(int id, User newUser) {
         Connection connection = connectionManager.getConnection();
         boolean result = false;
         String login = newUser.getLogin();
         String password = newUser.getPassword();
-        int roleId = 0;
-        if (newUser instanceof Admin) {
-            roleId = 1;
-        }
-        if (newUser instanceof Teacher) {
-            roleId = 2;
-        }
-        if (newUser instanceof Student) {
-            roleId = 3;
-        }
+        int roleId = detectUserRole(newUser);
         String fname = "";
         String lname = "";
         if (newUser.getFirstName() != null) {
@@ -180,6 +202,10 @@ public class UserDAOImpl implements UserDAO {
         return result;
     }
 
+    /**
+     * Deletes user from database by id value
+     * @param id
+     */
     @Override
     public void deleteUser(int id) {
         if (getUserById(id) != null) {
@@ -196,6 +222,11 @@ public class UserDAOImpl implements UserDAO {
         }
     }
 
+    /**
+     * Returns user id by login
+     * @param login
+     * @return id value
+     */
     public int getUserId(String login) {
         int result = -1;
         Connection connection = connectionManager.getConnection();
@@ -214,6 +245,12 @@ public class UserDAOImpl implements UserDAO {
         return result;
     }
 
+    /**
+     * Encrypt and update user password stored in database
+     * @param login
+     * @param newPassword
+     * @return
+     */
     public boolean updatePassword(String login, String newPassword) {
         boolean result = false;
         if (login!=null && newPassword!=null){
@@ -236,4 +273,19 @@ public class UserDAOImpl implements UserDAO {
         }
         return result;
     }
+
+    private int detectUserRole(User user) {
+        int roleId = 0;
+        if (user instanceof Admin) {
+            roleId = 1;
+        }
+        if (user instanceof Teacher) {
+            roleId = 2;
+        }
+        if (user instanceof Student) {
+            roleId = 3;
+        }
+        return roleId;
+    }
+
 }

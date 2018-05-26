@@ -1,4 +1,10 @@
 package ru.innopolis.stc9.db.dao;
+/**
+ * Contains methods to operate with user data from Admin account
+ *
+ * @author Daniil Ivantsov
+ * @version 1.0
+ */
 
 import org.apache.log4j.Logger;
 import ru.innopolis.stc9.db.connection.ConnectionManager;
@@ -21,6 +27,10 @@ public class AdminDAO {
         return false;
     }
 
+    /**
+     * Returns full list of users stored in database
+     * @return a <tt>List</tt> object
+     */
     public List<User> getUsersList() {
         ArrayList<User> result = new ArrayList<>();
         Connection connection = connectionManager.getConnection();
@@ -31,6 +41,7 @@ public class AdminDAO {
                 while (resultSet.next()) {
                     result.add(userDao.getUserFromResultSet(resultSet));
                 }
+                logger.info("Users list successfully returned.");
             }
             connection.close();
         } catch (SQLException e) {

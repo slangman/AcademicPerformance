@@ -1,11 +1,9 @@
 package ru.innopolis.stc9.service;
 
 import ru.innopolis.stc9.db.dao.AdminDAO;
+import ru.innopolis.stc9.db.dao.CourseDAOImpl;
 import ru.innopolis.stc9.db.dao.UserDAOImpl;
-import ru.innopolis.stc9.pojo.Admin;
-import ru.innopolis.stc9.pojo.Student;
-import ru.innopolis.stc9.pojo.Teacher;
-import ru.innopolis.stc9.pojo.User;
+import ru.innopolis.stc9.pojo.*;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -19,18 +17,42 @@ public class AdminService {
 
     private UserDAOImpl userDAO = new UserDAOImpl();
     private AdminDAO adminDao = new AdminDAO();
+    private CourseDAOImpl courseDAO = new CourseDAOImpl();
     private UserService userService = new UserService();
 
-    public String getOldPasswordMessage() {
-        return oldPasswordMessage;
+    public Object getSessionAttribute (HttpServletRequest req , String attribute) {
+        Object result=null;
+        if (req.getSession().getAttribute(attribute)!=null) {
+            result = req.getSession().getAttribute(attribute);
+            req.getSession().setAttribute(attribute, null);
+        }
+        return result;
     }
 
-    public String getNewPasswordMessage() {
-        return newPasswordMessage;
+    public String addOrEditCourse(HttpServletRequest req) {
+        String result="";
+        String operation = (String) getSessionAttribute(req, "operation");
+        int courseId = (Integer)getSessionAttribute(req, "courseId");
+        String courseName = req.getParameter("courseName");
+        String courseDescription = req.getParameter("courseDescription");
+        Course course = new Course();
+        course.setName(courseName);
+        course.setDescription(courseDescription);
+        //TODO хардкод, поменять!
+        course.setTeacherId(100);
+        if (operation.equals("new-course")) {
+            courseDAO.addCourse(course);
+            result = "course-added";
+        }
+        if (operation.equals("edit-existing")) {
+            courseDAO.updateCourse(courseId, course);
+            result = "updated";
+        }
+        return ("?operation=" + operation + "&course-id=" + courseId + "&msg=" + result);
     }
 
-    public boolean addUser(User newUser) {
-        return userDAO.addUser(newUser);
+    public List<Course> getCourses() {
+        return courseDAO.getCoursesList();
     }
 
     public List<User> getUsersList() {
@@ -50,6 +72,22 @@ public class AdminService {
         return result;
     }
 
+    public String getErrorMessage(String err) {
+        String result = null;
+        if (err != null && !err.isEmpty()) {
+            if (err.equals("passwords-not-equal")) {
+                result = "Passwords are not equal.";
+            }
+            if (err.equals("insecure-pass")) {
+                result = "New password must contain at least 3 characters.";
+            }
+            if (err.equals("incorrect-old-pass")) {
+                result = "Incorrect old password.";
+            }
+        }
+        return result;
+    }
+
     public boolean updateUser(String login, String newFirstName, String newLastName) {
         User user = userDAO.getUserByLogin(login);
         user.setFirstName(newFirstName);
@@ -57,8 +95,8 @@ public class AdminService {
         return userDAO.updateUser(userDAO.getUserId(login), user);
     }
 
-    public boolean updatePassword(HttpServletRequest req) {
-        boolean result = false;
+    public String updatePassword(HttpServletRequest req) {
+        String result = null;
         String login = req.getParameter("editLogin");
         String oldPassword = req.getParameter("oldPassword");
         String newPassword = req.getParameter("newPassword");
@@ -72,18 +110,14 @@ public class AdminService {
             if (passwordIsSecure(newPassword)) {
                 if (newPassword.equals(repeatNewPassword)) {
                     userDAO.updatePassword(login, newPassword);
-                    result=true;
                 } else {
-                    System.out.println("Passwords are not equal");
-                    newPasswordMessage = "Passwords are not equal";
+                    result = "passwords-not-equal";
                 }
             } else {
-                System.out.println("New password must contain at least 3 characters.");
-                newPasswordMessage = "New password must contain at least 3 characters.";
+                result="insecure-pass";
             }
         } else {
-            System.out.println("Incorrect old password");
-            oldPasswordMessage = "Incorrect old password";
+            result="incorrect-old-pass";
         }
         return result;
     }

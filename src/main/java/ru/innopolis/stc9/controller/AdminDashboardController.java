@@ -21,6 +21,7 @@ public class AdminDashboardController extends HttpServlet {
         String helloMessage = userService.getHelloMessage(login);
         req.setAttribute("helloMessage", helloMessage);
         req.setAttribute("users", adminService.getUsersList());
+        req.setAttribute("courses", adminService.getCourses());
         req.getRequestDispatcher("/admin-dashboard.jsp").forward(req, resp);
     }
 

@@ -97,3 +97,10 @@ div.content {
     width: 100%;
     text-align: center;
 }
+
+/* View course page
+------------------------------------------------------------------------- */
+
+.col-md-12.students-list {
+    margin-top: 20px;
+}

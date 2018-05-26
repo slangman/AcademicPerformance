@@ -1,5 +1,13 @@
 package ru.innopolis.stc9.db.dao;
 
+/**
+ * Implementation of GradeDAO interface.
+ * Operates with grade data stored in database.
+ *
+ * @author Daniil Ivantsov
+ * @version 1.0
+ */
+
 import org.apache.log4j.Logger;
 import ru.innopolis.stc9.db.connection.ConnectionManager;
 import ru.innopolis.stc9.db.connection.ConnectionManagerJDBCImpl;

@@ -17,6 +17,10 @@ public class CourseService {
     private CourseDAOImpl courseDao = new CourseDAOImpl();
     private StudentDAO studentDAO = new StudentDAO();
 
+    public Course getCourse(int id) {
+        return courseDao.getCourseById(id);
+    }
+
     public String getCourseName(int courseId) {
         String result=null;
         if (courseId>0) {
@@ -25,7 +29,12 @@ public class CourseService {
         return result;
     }
 
-    public Map<String, String> getTasks(int courseId) {
+    public List<Task> getTasks(int courseId) {
+        List<Task> tasks = courseDao.getTasks(courseId);
+        return tasks;
+    }
+
+    public Map<String, String> getTasksOld(int courseId) {
         Map<String,String> result = new HashMap<>();
         List<Task> tasks = courseDao.getTasks(courseId);
         for (Task task : tasks) {
